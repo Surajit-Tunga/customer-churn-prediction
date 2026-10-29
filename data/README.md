@@ -54,7 +54,7 @@ Derived datasets are generated via the automated data pipeline executed in `note
 | **Licensing Terms** | Inherited from raw source (Academic / Educational Prototyping) |
 | **Refresh Date** | 2026-10-28 |
 | **Data Dimensions** | 5,634 observations × 24 variables |
-| **Usage Scope** | Baseline model training (Diyasha Roy — Task MOD-01) |
+| **Usage Scope** | Baseline model training (Diyasha Roy) |
 
 ### Dataset Metadata: `test_telco_churn.csv`
 
