@@ -33,7 +33,7 @@ The primary source file represents historical customer account data originating 
 | :--- | :--- |
 | **File Path** | `data/raw/raw_telco_churn.csv` |
 | **Source / Provenance** | IBM Cognos Analytics base samples authored by Steven Macko (via Kaggle repository by `yeanzc`) |
-| **Licensing Terms** | Kaggle Tagged: "Other (specified in description)" — Approved for non-commercial academic research, educational prototyping, and internal model benchmarking with proper IBM attribution |
+| **Licensing Terms** | Apache License, Version 2.0 |
 | **Refresh Date** | 2026-10-28 |
 | **Data Dimensions** | 7,043 observations × 33 variables |
 | **Primary Target Variable** | `Churn Value` (Binary: `0` = Retained, `1` = Churned) |
@@ -51,7 +51,7 @@ Derived datasets are generated via the automated data pipeline executed in `note
 | :--- | :--- |
 | **File Path** | `data/processed/train_telco_churn.csv` |
 | **Source / Lineage** | Stratified 80% partition derived from `data/raw/raw_telco_churn.csv` (`random_state=42`) |
-| **Licensing Terms** | Inherited from raw source (Academic / Educational Prototyping) |
+| **Licensing Terms** | Inherited from Apache License, Version 2.0 |
 | **Refresh Date** | 2026-10-28 |
 | **Data Dimensions** | 5,634 observations × 24 variables |
 | **Usage Scope** | Baseline model training (Diyasha Roy) |
@@ -62,7 +62,7 @@ Derived datasets are generated via the automated data pipeline executed in `note
 | :--- | :--- |
 | **File Path** | `data/processed/test_telco_churn.csv` |
 | **Source / Lineage** | Stratified 20% holdout partition derived from `data/raw/raw_telco_churn.csv` (`random_state=42`) |
-| **Licensing Terms** | Inherited from raw source (Academic / Educational Prototyping) |
+| **Licensing Terms** | Inherited from Apache License, Version 2.0 |
 | **Refresh Date** | 2026-10-28 |
 | **Data Dimensions** | 1,409 observations × 24 variables |
 | **Usage Scope** | Independent model evaluation and metrics benchmarking |

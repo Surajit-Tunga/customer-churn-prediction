@@ -13,7 +13,7 @@ attributes
 ---
 
 ## 2. License, Terms & Access Constraints
-* **Kaggle Licensing Tag:** Designated as *"Other (specified in description)"*.
+* **Licensing Tag:** Apache License, Version 2.0*.
 * **Permissibility:** Derived from official IBM sample assets created for analytics and demonstration. Permitted for academic research, education, benchmarking, and internal prototyping with attribution to IBM Corporation.
 * **Access Protocol:** Publicly accessible via Python (`kagglehub.dataset_download("yeanzc/telco-customer-churn-ibm-dataset")`) without requiring private API keys or authentication credentials.
 * **Privacy & Governance:** Contains no real-world Personally Identifiable Information (PII). Customer records use synthetic administrative IDs (`CustomerID`), satisfying standard data minimization and privacy guidelines.
