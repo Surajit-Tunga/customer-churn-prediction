@@ -148,9 +148,11 @@ To capture non-linear behavioural patterns and enhance downstream model baseline
 
 * **Vectorization Logic:** Vectorized sum of active add-on value-added services across 6 binary indicator fields:
 
-  $$\text{Total\_Services} = \sum_{i=1}^{6} \text{Service}_i$$
+  $$\text{Total Services} = \sum_{i=1}^{6} \text{Service}_i$$
 
-  Where $\text{Service}_i \in \{\text{Online Security}, \text{Online Backup}, \text{Device Protection}, \text{Tech Support}, \text{Streaming TV}, \text{Streaming Movies}\}$, taking a value of $1$ if 'Yes' and $0$ if 'No' or 'No internet service'.
+  Where $\text{Service}_i \in \{\text{Online Security}, \text{Online Backup}, \text{Device Protection}, \text{Tech Support}, \text{Streaming TV}, \text{Streaming Movies}\}$.
+
+  <sup>**Mapping:** For each $\text{Service}_i$, assign $1$ if the value is 'Yes', and $0$ if the value is 'No' or 'No internet service'.</sup>
 
 * **Business Rationale:** Quantifies customer product breadth and ecosystem stickiness. Subscribers with multiple active services face significantly higher switching friction and exhibit lower churn probability compared to single-service accounts.
 
@@ -158,7 +160,7 @@ To capture non-linear behavioural patterns and enhance downstream model baseline
 
 * **Ratio Logic:** Ratio of current monthly billing commitment relative to cumulative account longevity:
 
-  $$\text{Monthly\_to\_Tenure\_Ratio} = \frac{\text{Monthly Charges}}{\text{Tenure Months} + 1}$$
+  $$\text{Monthly_to_Tenure_Ratio} = \frac{\text{Monthly Charges}}{\text{Tenure Months} + 1}$$
 
   *(Note: A Laplace-style $+1$ smoothing factor is added to the denominator to eliminate division-by-zero errors for brand-new accounts where $\text{Tenure Months} = 0$).*
 
