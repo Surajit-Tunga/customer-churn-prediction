@@ -208,11 +208,10 @@ def main():
     model_name = st.sidebar.selectbox("Select model", ["Champion", "Challenger"], index=0)
 
     metadata = load_model_metadata()
-    st.sidebar.json({
-        "algorithm": metadata[model_name.lower()]["algorithm"],
-        "target": metadata["target"],
-        "feature_count": len(metadata["feature_schema"]),
-    })
+    st.sidebar.markdown("### Model details")
+    st.sidebar.write(f"**Algorithm:** {metadata[model_name.lower()]['algorithm']}")
+    st.sidebar.write(f"**Target:** {metadata['target']}")
+    st.sidebar.write(f"**Features:** {len(metadata['feature_schema'])}")
 
     with st.form("customer_form"):
         st.subheader("Customer profile")
@@ -285,7 +284,7 @@ def main():
             col_b.metric("Risk category", risk_label)
             col_c.metric("Model", model_name)
 
-            st.progress(min_value=0.0, max_value=1.0, value=probability)
+            st.progress(probability)
 
             if probability >= 0.5:
                 st.warning("This customer is at elevated risk of churn and may need a retention intervention.")
