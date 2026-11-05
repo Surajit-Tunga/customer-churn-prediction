@@ -1,15 +1,15 @@
 # Customer Churn Prediction
 
 This repository contains an IBM Telco Customer Churn analysis project covering
-preprocessing, feature engineering, model training, evaluation, and a simple
-Streamlit demonstration dashboard.
+preprocessing, feature engineering, model training, evaluation, and a Streamlit
+application for interactive churn-risk predictions.
 
 ## Repository structure
 
 ```text
 .
 ├── app/
-│   ├── app.py                 # Streamlit demo app
+│   ├── app.py                 # Streamlit ML prediction application
 │   └── components/           # Reusable UI components
 ├── data/
 │   ├── raw/                  # Original source dataset
@@ -50,7 +50,7 @@ The workflow is organized around the IBM Telco dataset and includes:
 - engineered churn-risk indicators and train/test split creation
 - model comparison using champion and challenger approaches
 - reproducible evaluation metrics and project reports
-- a lightweight Streamlit demo for illustrating churn risk scoring
+- a Streamlit app connected to the saved Champion and Challenger model artifacts
 
 ## Setup
 
@@ -71,12 +71,37 @@ source .venv/bin/activate
 
 ## Run the app
 
+From the repository root, install the dependencies and start Streamlit:
+
 ```bash
 python -m streamlit run app/app.py
 ```
 
-The dashboard is a demo that uses fixed example rules and should not be treated
-as a production decision model.
+The app loads the saved model artifacts and feature schema from `models/`. It
+provides a customer input form, lets you select the Champion or Challenger
+model, computes the required engineered features, and displays the model's
+estimated churn probability and a risk category. The risk categories are
+application-side bands: Low below 35%, Medium from 35% to below 60%, and High
+at 60% or above.
+
+The prediction is an estimate from the selected trained model, not a guarantee
+of customer behavior or a substitute for human review. The app has been
+verified locally with both model choices. It is not currently deployed, so
+there is no public application URL.
+
+### Current application status
+
+- **Available:** Single-customer interactive prediction using the saved
+  Champion or Challenger artifact.
+- **Not yet included:** Batch CSV predictions, prediction history, and
+  model-explanation features.
+- **Not yet complete for launch:** Deployment setup and hosted-environment
+  verification.
+
+The application depends on a stable model integration contract. The model
+owner is responsible for maintaining the artifacts, feature schema and
+encodings, dependencies, and prediction-score meaning. Changes to that contract
+may require corresponding application updates.
 
 ## Train and evaluate the model
 
@@ -105,3 +130,5 @@ script writes metrics to [docs/champion_challenger_evaluation.json](docs/champio
 - Keep the raw data immutable and document source, licensing, and usage before
   committing new datasets
 - Do not store sensitive or unlicensed customer data in the repository
+
+---
