@@ -1,0 +1,43 @@
+{
+    "champion": {
+        "model_name": "Champion (Logistic Regression)",
+        "roc_auc": 0.8504533829342015,
+        "pr_auc": 0.6692851345571649,
+        "brier_score": 0.16233424222663698,
+        "recall_sensitivity": 0.7834224598930482,
+        "precision": 0.5167548500881834,
+        "f1_score": 0.6227417640807651,
+        "accuracy": 0.7480482611781405,
+        "confusion_matrix": [
+            [
+                761,
+                274
+            ],
+            [
+                81,
+                293
+            ]
+        ]
+    },
+    "challenger": {
+        "model_name": "Challenger (Gradient Boosting)",
+        "roc_auc": 0.8509946007388463,
+        "pr_auc": 0.6710785376401254,
+        "brier_score": 0.16021195276090267,
+        "recall_sensitivity": 0.8101604278074866,
+        "precision": 0.5188356164383562,
+        "f1_score": 0.6325678496868476,
+        "accuracy": 0.7501774308019872,
+        "confusion_matrix": [
+            [
+                754,
+                281
+            ],
+            [
+                71,
+                303
+            ]
+        ]
+    },
+    "recommendation": "Challenger (Gradient Boosting)"
+}
