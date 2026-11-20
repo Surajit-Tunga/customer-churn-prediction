@@ -53,7 +53,7 @@ Derived datasets are generated via the automated data pipeline executed in `note
 | **Source / Lineage** | Stratified 80% partition derived from `data/raw/raw_telco_churn.csv` (`random_state=42`) |
 | **Licensing Terms** | Inherited from Apache License, Version 2.0 |
 | **Refresh Date** | 2026-10-28 |
-| **Data Dimensions** | 5,634 observations × 24 variables |
+| **Data Dimensions** | 5,634 observations × 23 variables |
 | **Usage Scope** | Baseline model training (Diyasha Roy) |
 
 ### Dataset Metadata: `test_telco_churn.csv`
@@ -64,7 +64,7 @@ Derived datasets are generated via the automated data pipeline executed in `note
 | **Source / Lineage** | Stratified 20% holdout partition derived from `data/raw/raw_telco_churn.csv` (`random_state=42`) |
 | **Licensing Terms** | Inherited from Apache License, Version 2.0 |
 | **Refresh Date** | 2026-10-28 |
-| **Data Dimensions** | 1,409 observations × 24 variables |
+| **Data Dimensions** | 1,409 observations × 23 variables |
 | **Usage Scope** | Independent model evaluation and metrics benchmarking |
 
 ### Artifact Metadata: `input_encoders.pkl`

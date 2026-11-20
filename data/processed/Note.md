@@ -3,8 +3,8 @@
 ## 1. Processed Deliverables & File Index
 | Output File / Artifact | Dimensions / Format | Description & Role | Downstream Owner |
 | :--- | :--- | :--- |:--- |
-| `train_telco_churn.csv` | 5,634 rows x 24 columns | Stratified 80% training partition | Diyasha (Baseline Modelling) |
-| `test_telco_churn.csv` | 1,409 rows x 24 columns | Stratified 20% holdout test partition | Diyasha (Model Validation) |
+| `train_telco_churn.csv` | 5,634 rows x 23 columns | Stratified 80% training partition | Diyasha (Baseline Modelling) |
+| `test_telco_churn.csv` | 1,409 rows x 23 columns | Stratified 20% holdout test partition | Diyasha (Model Validation) |
 | `input_encoders.pkl` | Binary Pickle File (`joblib`) | Dictionary of fitted `LabelEncoder` objects | Surajit (Streamlit App Integration) |
 
 ---
@@ -33,4 +33,4 @@ All data preparation and feature transformations were executed reproducibly in P
 ## 3. Split & Versioning Conventions
 * **Random Seed:** `random_state=42` across all split operations.
 * **Index Persistence:** CSV files are exported with `index=False` to prevent index column proliferation.
-* **Handoff Contract:** The processed dataset schema (23 predictive features + 1 target `Churn Value`) is frozen for model comparison and Streamlit app integration.
+* **Handoff Contract:** The processed dataset schema (22 predictive features + 1 target `Churn Value`) is frozen for model comparison and Streamlit app integration.
