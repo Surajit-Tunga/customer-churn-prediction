@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 import joblib
@@ -13,7 +14,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_DIR = BASE_DIR / "models"
 METADATA_PATH = MODEL_DIR / "model_metadata.json"
 
-FEATURE_SCHEMA = []
+HIGH_RISK_THRESHOLD = 0.60
+MEDIUM_RISK_THRESHOLD = 0.35
+MODEL_SETUP_INSTRUCTION = "Run `python src/train.py` before `streamlit run app/app.py`."
 
 BOOL_MAP = {"No": 0, "Yes": 1}
 MULTIPLE_LINES_MAP = {"No": 0, "No phone service": 1, "Yes": 2}
@@ -193,17 +196,51 @@ def predict_churn(model_name: str, data: dict):
 
 
 def format_risk(probability: float) -> str:
-    if probability >= 0.60:
+    if probability >= HIGH_RISK_THRESHOLD:
         return "High risk"
-    if probability >= 0.35:
+    if probability >= MEDIUM_RISK_THRESHOLD:
         return "Medium risk"
     return "Low risk"
+
+
+def risk_message(probability: float) -> str:
+    risk_label = format_risk(probability)
+    if risk_label == "High risk":
+        return "High risk: this customer may need a retention intervention."
+    if risk_label == "Medium risk":
+        return "Medium risk: consider reviewing this customer's retention needs."
+    return "Low risk: this customer appears relatively stable based on the current model."
+
+
+def validate_customer_inputs(
+    tenure_months, monthly_charges, total_charges, phone_service, multiple_lines
+) -> str | None:
+    try:
+        tenure = int(tenure_months)
+        monthly = float(monthly_charges)
+        total = float(total_charges)
+    except (TypeError, ValueError):
+        return "Enter valid values for tenure and charges."
+
+    if not math.isfinite(monthly) or not 0 <= monthly <= 120:
+        return "Monthly Charges must be between $0 and $120."
+    if not math.isfinite(total) or not 0 <= total <= 9000:
+        return "Total Charges must be between $0 and $9,000."
+    if (tenure == 0) != (total == 0):
+        return "Tenure and Total Charges must both be zero, or both be greater than zero."
+    if phone_service == "No" and multiple_lines == "Yes":
+        return "Multiple Lines cannot be Yes when Phone Service is No."
+    return None
 
 
 def main():
     st.set_page_config(page_title="Customer Churn Predictor", page_icon="📊", layout="wide")
     st.title("Customer Churn Prediction")
     st.caption("Predict churn risk using the trained champion or challenger model.")
+
+    if not MODEL_DIR.is_dir() or not METADATA_PATH.is_file():
+        st.error(f"Model files are missing. {MODEL_SETUP_INSTRUCTION}")
+        st.stop()
 
     model_name = st.sidebar.selectbox("Select model", ["Champion", "Challenger"], index=0)
 
@@ -219,12 +256,15 @@ def main():
 
         with col1:
             gender = st.selectbox("Gender", ["Female", "Male"])
+            st.caption("not used by the model")
             senior_citizen = st.selectbox("Senior Citizen", ["No", "Yes"])
             partner = st.selectbox("Partner", ["No", "Yes"])
             dependents = st.selectbox("Dependents", ["No", "Yes"])
             tenure_months = st.slider("Tenure Months", min_value=0, max_value=72, value=12)
             phone_service = st.selectbox("Phone Service", ["No", "Yes"])
+            st.caption("not used by the model")
             multiple_lines = st.selectbox("Multiple Lines", ["No", "No phone service", "Yes"])
+            st.caption("not used by the model")
             internet_service = st.selectbox("Internet Service", ["DSL", "Fiber optic", "No"])
             online_security = st.selectbox("Online Security", ["No", "Yes", "No internet service"])
             online_backup = st.selectbox("Online Backup", ["No", "Yes", "No internet service"])
@@ -245,10 +285,15 @@ def main():
                     "Mailed check",
                 ],
             )
-            monthly_charges = st.number_input("Monthly Charges ($)", min_value=0.0, max_value=2000.0, value=70.0, step=1.0)
-            total_charges = st.number_input("Total Charges ($)", min_value=0.0, max_value=20000.0, value=500.0, step=1.0)
+            monthly_charges = st.number_input("Monthly Charges ($)", min_value=0.0, max_value=120.0, value=70.0, step=1.0)
+            total_charges = st.number_input("Total Charges ($)", min_value=0.0, max_value=9000.0, value=500.0, step=1.0)
 
-        submitted = st.form_submit_button("Predict churn risk")
+        validation_message = validate_customer_inputs(
+            tenure_months, monthly_charges, total_charges, phone_service, multiple_lines
+        )
+        if validation_message:
+            st.error(validation_message)
+        submitted = st.form_submit_button("Predict churn risk", disabled=bool(validation_message))
 
     if submitted:
         data = {
@@ -286,10 +331,11 @@ def main():
 
             st.progress(probability)
 
-            if probability >= 0.5:
-                st.warning("This customer is at elevated risk of churn and may need a retention intervention.")
+            message = risk_message(probability)
+            if risk_label != "Low risk":
+                st.warning(message)
             else:
-                st.success("This customer appears relatively stable based on the current model.")
+                st.success(message)
 
             if internet_service == "No":
                 st.info("Since the customer has no internet service, the digital service add-ons are automatically treated as 'No internet service'.")

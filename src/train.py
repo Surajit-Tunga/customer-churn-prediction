@@ -7,12 +7,10 @@ Champion-Challenger Training Pipeline:
 - Challenger: Gradient Boosting / XGBoost Classifier (Non-linear Ensemble)
 """
 
-import os
 import json
 import logging
 from pathlib import Path
 import joblib
-import numpy as np
 import pandas as pd
 
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_validate
@@ -21,6 +19,9 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger(__name__)
+
 # Try importing XGBoost; fall back to scikit-learn's native HistGradientBoosting if not installed
 try:
     from xgboost import XGBClassifier
@@ -28,13 +29,11 @@ try:
 except ImportError:
     from sklearn.ensemble import HistGradientBoostingClassifier as XGBClassifier
     BOOSTING_TYPE = "HistGradientBoosting"
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger(__name__)
+    logger.warning("XGBoost is unavailable; falling back to HistGradientBoosting.")
 
 # Directory configuration matching project architecture
 BASE_DIR = Path(__file__).resolve().parent.parent
-PROCESSED_DATA_DIR = BASE_DIR / "data" / "processed"
+RAW_DATA_PATH = BASE_DIR / "data" / "raw" / "raw_telco_churn.csv"
 MODEL_DIR = BASE_DIR / "models"
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -51,38 +50,99 @@ NUMERICAL_COLS = [
 PRUNED_COLS = ["Phone Service", "Gender", "Multiple Lines"]
 
 
-def load_dataset():
-    """Loads processed train dataset, with automatic fallback to root CSV."""
-    train_path = PROCESSED_DATA_DIR / "train_telco_churn.csv"
-    root_csv = BASE_DIR / "telco churn .csv"
-    
-    if train_path.exists():
-        logger.info(f"Loading existing processed train data: {train_path}")
-        df = pd.read_csv(train_path)
-        X = df.drop(columns=[TARGET_COL])
-        y = df[TARGET_COL].astype(int)
-    elif root_csv.exists():
-        logger.info(f"Generating stratified 80/20 train-test split from {root_csv}...")
-        df = pd.read_csv(root_csv)
-        X = df.drop(columns=[TARGET_COL])
-        y = df[TARGET_COL].astype(int)
-        
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.20, random_state=42, stratify=y
-        )
-        PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
-        train_df = pd.concat([X_train, y_train], axis=1)
-        test_df = pd.concat([X_test, y_test], axis=1)
-        train_df.to_csv(PROCESSED_DATA_DIR / "train_telco_churn.csv", index=False)
-        test_df.to_csv(PROCESSED_DATA_DIR / "test_telco_churn.csv", index=False)
-        logger.info("Saved train_telco_churn.csv and test_telco_churn.csv to data/processed/")
-        X, y = X_train, y_train
-    else:
-        raise FileNotFoundError("Could not locate train_telco_churn.csv or telco churn .csv")
+FEATURE_SCHEMA = [
+    "Senior Citizen",
+    "Partner",
+    "Dependents",
+    "Tenure Months",
+    "Internet Service",
+    "Online Security",
+    "Online Backup",
+    "Device Protection",
+    "Tech Support",
+    "Streaming TV",
+    "Streaming Movies",
+    "Contract",
+    "Paperless Billing",
+    "Payment Method",
+    "Monthly Charges",
+    "Total Charges",
+    "Tenure_Cohort",
+    "Total_Services",
+    "Monthly_to_Tenure_Ratio",
+]
 
-    # Prune non-informative columns if present
-    X = X.drop(columns=[c for c in PRUNED_COLS if c in X.columns], errors="ignore")
-    return X, y
+
+def prepare_training_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Build the same 19 ordered inputs used by the Streamlit form."""
+    source = df.drop(columns=PRUNED_COLS, errors="ignore").copy()
+    tenure = pd.to_numeric(source["Tenure Months"]).astype(int)
+    monthly_charges = pd.to_numeric(source["Monthly Charges"])
+    total_charges = pd.to_numeric(source["Total Charges"], errors="coerce").fillna(0.0)
+    internet_service = source["Internet Service"].astype(str)
+
+    service_columns = [
+        "Online Security",
+        "Online Backup",
+        "Device Protection",
+        "Tech Support",
+        "Streaming TV",
+        "Streaming Movies",
+    ]
+    services = source[service_columns].astype(str).copy()
+    services.loc[internet_service == "No", service_columns] = "No internet service"
+
+    encoded = pd.DataFrame(index=source.index)
+    for column in ["Senior Citizen", "Partner", "Dependents", "Paperless Billing"]:
+        encoded[column] = source[column].map({"No": 0, "Yes": 1})
+    encoded["Tenure Months"] = tenure
+    encoded["Internet Service"] = internet_service.map({"DSL": 0, "Fiber optic": 1, "No": 2})
+    service_map = {"No": 0, "No internet service": 1, "Yes": 2}
+    for column in service_columns:
+        encoded[column] = services[column].map(service_map)
+    encoded["Contract"] = source["Contract"].map(
+        {"Month-to-month": 0, "One year": 1, "Two year": 2}
+    )
+    encoded["Payment Method"] = source["Payment Method"].map(
+        {
+            "Bank transfer (automatic)": 0,
+            "Credit card (automatic)": 1,
+            "Electronic check": 2,
+            "Mailed check": 3,
+        }
+    )
+    encoded["Monthly Charges"] = monthly_charges
+    encoded["Total Charges"] = total_charges
+    encoded["Tenure_Cohort"] = pd.cut(
+        tenure,
+        bins=[-1, 12, 24, 48, 72],
+        labels=["Cohort_0_12", "Cohort_13_24", "Cohort_25_48", "Cohort_49_72"],
+    ).map(
+        {
+            "Cohort_0_12": 0,
+            "Cohort_13_24": 1,
+            "Cohort_25_48": 2,
+            "Cohort_49_72": 3,
+        }
+    )
+    encoded["Total_Services"] = (services == "Yes").sum(axis=1)
+    encoded["Monthly_to_Tenure_Ratio"] = monthly_charges / (tenure + 1)
+    return encoded[FEATURE_SCHEMA]
+
+
+def load_dataset():
+    """Load raw customer records and build a split using the app's input schema."""
+    if not RAW_DATA_PATH.exists():
+        raise FileNotFoundError(f"Raw training data not found: {RAW_DATA_PATH}")
+
+    df = pd.read_csv(RAW_DATA_PATH)
+    X = prepare_training_features(df)
+    y = df[TARGET_COL].astype(int)
+    X_train, _, y_train, _ = train_test_split(
+        X, y, test_size=0.20, random_state=42, stratify=y
+    )
+    logger.info("Loaded raw customer data with the app's 19-feature schema.")
+    return X_train, y_train
 
 
 def build_preprocessor(feature_names):
