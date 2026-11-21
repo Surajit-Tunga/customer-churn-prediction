@@ -87,6 +87,7 @@ Every dataset progression from `data/raw/` to `data/processed/` must pass four v
 ### A. Schema & Data Type Validation
 * **Data Type Alignment:** Inspected all 33 initial attributes. Continuous financial attributes, such as `Monthly Charges` and `Total Charges`, were verified for numerical typing.
 * **Feature Pruning:** Administrative identifiers, static location indicators, and non-predictive attributes (`CustomerID`, `Count`, `Country`, `State`, `City`, `Zip Code`, `Lat Long`, `Latitude`, `Longitude`, `CLTV`, `Gender`, `Phone Service`) were removed to prevent spurious feature correlation, eliminate noise, and enforce privacy standards.
+* **Spatial Data Minimization:** High-granularity location indicators (`Country`, `State`, `City`, `Zip Code`, `Lat Long`, `Latitude`, `Longitude`) were pruned under an explicit data minimization directive. This eliminates re-identification risks and prevents spatial bias in baseline classifiers.
 
 ### B. Missing Value Identification & Coercion
 * **Whitespace Bug Resolution:** Identified 11 records in `Total Charges` containing whitespace string characters (`" "`) corresponding strictly to new accounts with `Tenure Months == 0`.
@@ -113,8 +114,12 @@ To ensure engineered risk indicators improve model performance without introduci
 ## 5. Security, Licensing & Compliance Directives
 
 1. **PII and Privacy Compliance:**
-   * The IBM Telco dataset utilizes synthetic customer profiles and generated numbers. No real-world customer names, addresses, or financial credentials exist within these files.
+   * Formally verified against IBM Cognos Analytics sample dataset documentation: raw materials consist strictly of synthetic customer profiles containing zero real-world names, street addresses, or financial identifiers.
 2. **Commit Policy for Sensitive or Licensed Data:**
    * **Rule:** Do not commit proprietary, commercial, or sensitive data to this repository unless explicit written permission and license terms permit public hosting.
    * **Scope Boundary:** Only datasets explicitly cleared under open licenses or non-PII educational terms (such as the current IBM Telco sample) may reside in `data/raw/` or `data/processed/`.
    * **Credentials Protection:** API keys, access tokens, and environment variables (e.g., `Kaggle API` keys) must never be committed to git or exposed within notebook cells.
+3. **Licensing & Governance Compliance** 
+   * **License Terms:** Governed under the **Apache License, Version 2.0** (`LICENSE.txt` located at root).
+   * **Upstream Attribution:** Original raw sample dataset authored by Steven Macko (Copyright 2019 IBM Corporation). 
+   * **Commercial Prototyping:** Fully permitted under Section 2 & 3 of Apache 2.0; derivative pipeline scripts and serialized `preprocessing.pkl` artifacts are open for internal application deployment.
