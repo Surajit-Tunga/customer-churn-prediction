@@ -30,11 +30,10 @@ application for interactive churn-risk predictions.
 │   ├── train.py              # Champion/challenger model training
 │   ├── evaluate.py           # Holdout evaluation metrics
 │   └── __init__.py
-├── test/
+├── tests/
 │   ├── README.md             # Testing notes
-│   ├── test_data.py           # Data QC checks
-│   ├── test_telco_data.py     # Telco validation suite
-│   └── test_model.py          # Model-level validation checks
+│   ├── test_data.py          # Source data checks
+│   └── test_model.py         # Model and Streamlit regression tests
 ├── CONTRIBUTING.md
 ├── LICENSE.txt
 ├── README.md
@@ -54,7 +53,7 @@ The workflow is organized around the IBM Telco dataset and includes:
 
 ## Setup
 
-Use Python 3 and install dependencies from the project root:
+Use Python 3.12 and install dependencies from the project root:
 
 ```powershell
 py -m venv .venv
@@ -71,9 +70,12 @@ source .venv/bin/activate
 
 ## Run the app
 
+From the repository root, install the dependencies and train the models before
+starting Streamlit:
 From the repository root, install the dependencies and start Streamlit:
 
 ```bash
+python src/train.py
 python -m streamlit run app/app.py
 ```
 
@@ -121,7 +123,7 @@ script writes metrics to [docs/champion_challenger_evaluation.json](docs/champio
 - [docs/data_quality_report.md](docs/data_quality_report.md)
 - [docs/section_2_data_preprocessing_and_feature_engineering_report.md](docs/section_2_data_preprocessing_and_feature_engineering_report.md)
 - [data/README.md](data/README.md)
-- [test/README.md](test/README.md)
+- [tests/README.md](tests/README.md)
 
 ## Data and governance
 
