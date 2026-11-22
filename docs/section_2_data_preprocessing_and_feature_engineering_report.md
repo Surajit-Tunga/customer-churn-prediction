@@ -147,9 +147,17 @@ To capture non-linear behavioural patterns and enhance downstream model baseline
 
 * **Discretization Logic:** Continuous `Tenure Months` values are partitioned into four discrete behavioral lifespan risk stages using an inclusive threshold function (`get_tenure_cohort`):
 
-  $$\text{Tenure\_Cohort} = \begin{cases} \text{'Cohort\_0\_12'} & \text{if } 0 \le \text{Tenure Months} \le 12 \\ \text{'Cohort\_13\_24'} & \text{if } 12 < \text{Tenure Months} \le 24 \\ \text{'Cohort\_25\_48'} & \text{if } 24 < \text{Tenure Months} \le 48 \\ \text{'Cohort\_49\_72'} & \text{if } \text{Tenure Months} > 48 \end{cases}$$
+```math
+  \text{Tenure\_Cohort} = 
+  \begin{cases}
+    \text{'Cohort\_0\_12'} & \text{if } 0 \leq \text{Tenure Months} \leq 12 \\
+    \text{'Cohort\_13\_24'} & \text{if } 12 < \text{Tenure Months} \leq 24 \\
+    \text{'Cohort\_25\_48'} & \text{if } 24 < \text{Tenure Months} \leq 48 \\
+    \text{'Cohort\_49\_72'} & \text{if } \text{Tenure Months} > 48
+  \end{cases}
+```
 
-  * **Zero-Tenure Boundary Allocation:** Using $0 \le \text{Tenure Months} \le 12$ ensures that all **11 brand-new customer accounts (`Tenure Months == 0`)** are cleanly assigned to `Cohort_0_12` with zero `NaN` values across the dataset.
+  * **Zero-Tenure Boundary Allocation:** Using `0 <= Tenure Months <= 12` ensures that all **11 brand-new customer accounts (`Tenure Months == 0`)** are cleanly assigned to `Cohort_0_12` with zero `NaN` values across the dataset.
 
 * **Business Rationale:** Churn risk is non-linear—cancellation propensity is heavily concentrated in the first 12 months. Discretizing continuous tenure allows linear classifiers (such as Logistic Regression) to model step-wise risk jumps without assuming strict linearity.
 
@@ -157,9 +165,12 @@ To capture non-linear behavioural patterns and enhance downstream model baseline
 
 * **Vectorization Logic:** Vectorized sum of active add-on value-added services across 6 binary indicator fields:
 
-  $$\text{Total\_Services} = \sum_{i=1}^{6} \mathbb{I}(\text{Service}_i = \text{'Yes'})$$
+```math
+\text{Total\_Services} = \sum_{i=1}^{6} \mathbb{I}(\text{Service}_i = \text{'Yes'})$$
+```
 
-  Where $\mathbb{I}$ is an indicator function evaluating to $1$ if the customer subscribes to add-on $i$ ($\text{Service}_i \in \{\text{Online Security}, \text{Online Backup}, \text{Device Protection}, \text{Tech Support}, \text{Streaming TV}, \text{Streaming Movies}\}$) and $0$ if `'No'` or `'No internet service'`.
+  Where $\mathbb{I}$ is an indicator function evaluating to $1$ if the customer subscribes to add-on $i$ ($`\text{Service}_i \in \{\text{Online Security}, \text{Online Backup}, \text{Device Protection}, \text{Tech Support}, \text{Streaming TV}, \text{Streaming Movies}\}`$) and $0$ if `'No'` or `'No internet service'`.
+
 
 * **Business Rationale:** Quantifies customer product breadth and ecosystem stickiness. Subscribers with multiple active services face significantly higher switching friction and exhibit lower churn probability compared to single-service accounts.
 
@@ -167,9 +178,12 @@ To capture non-linear behavioural patterns and enhance downstream model baseline
 
 * **Ratio & Log-1p Transformation Logic:** Ratio of current monthly billing commitment relative to cumulative account longevity with Laplace denominator smoothing ($+1$), followed by a $\ln(1 + x)$ transformation to eliminate upper-tail skewness (raw ratio values span $1.6$ to $>100$):
 
-  $$\text{Monthly\_to\_Tenure\_Ratio} = \frac{\text{Monthly Charges}}{\text{Tenure Months} + 1}$$
+  ```math
+  \(\text{Monthly\_to\_Tenure\_Ratio} = \frac{\text{Monthly Charges}}{\text{Tenure Months} + 1} \%\%\)MAGIT_PARSER_PROTECT%%  ```
 
-  $$\text{Log\_Monthly\_Tenure\_Ratio} = \ln\left(1 + \text{Monthly\_to\_Tenure\_Ratio}\right)$$
+  ```math
+  \(\text{Log\_Monthly\_Tenure\_Ratio} = \ln\left(1 + \text{Monthly\_to\_Tenure\_Ratio}\right) \%\%\)MAGIT_PARSER_PROTECT%%  ```
+
 
 * **Business Rationale:** Identifies early financial price shock while stabilizing variance for linear models. Accounts paying high monthly fees relative to short tenure demonstrate high price sensitivity and elevated early-cancellation risk.
 
@@ -223,7 +237,9 @@ Initial data profiling identified four key constraints and downstream deployment
 
 * **Cost-Sensitive Weight Formula:**
 
-  `w_churn = N_total / (2 × N_churn) = 5634 / (2 × 1495) ≈ 1.884`
+```math
+\(w_{\text{churn}} = \frac{N_{\text{total}}}{2 \times N_{\text{churn}}} = \frac{5634}{2 \times 1495} \approx 1.884\)
+```
 
 * **Probability Distortion & Calibration Safeguard (Task APP-01):** Because `class_weight='balanced'` shifts raw predicted probabilities `P(Y = 1 | X)` upward:
 
