@@ -141,19 +141,6 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
-
-## Run the application
-
-Trained models and the preprocessing artifact are included in the repository,
-so the app can be started directly after installing dependencies:
-
-```bash
-python -m streamlit run app/app.py
-```
-
-Streamlit will print a local URL (usually `http://localhost:8501`) to open in
-your browser.
-
 ## Retrain and evaluate
 
 To regenerate the preprocessor, processed splits, and model artifacts from the
@@ -167,6 +154,17 @@ python src/evaluate.py
 Training writes the artifacts to `data/processed/` and `models/`. Evaluation
 writes holdout metrics and the champion recommendation to
 `docs/champion_challenger_evaluation.json`.
+## Run the application
+
+Trained models and the preprocessing artifact are included in the repository,
+so the app can be started directly after installing dependencies:
+
+```bash
+python -m streamlit run app/app.py
+```
+
+Streamlit will print a local URL (usually `http://localhost:8501`) to open in
+your browser.
 
 ## Run tests
 
