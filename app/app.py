@@ -13,6 +13,7 @@ import streamlit as st
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_DIR = BASE_DIR / "models"
 METADATA_PATH = MODEL_DIR / "model_metadata.json"
+PREPROCESSOR_PATH = BASE_DIR / "data" / "processed" / "preprocessing.pkl"
 
 HIGH_RISK_THRESHOLD = 0.60
 MEDIUM_RISK_THRESHOLD = 0.35
@@ -46,7 +47,7 @@ def load_model_metadata():
     return metadata
 
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def load_model(model_name: str):
     metadata = load_model_metadata()
     artifact_name = metadata[model_name.lower()]["artifact"]
@@ -54,6 +55,11 @@ def load_model(model_name: str):
     if not model_path.exists():
         raise FileNotFoundError(f"Model artifact missing: {model_path}")
     return joblib.load(model_path)
+
+
+@st.cache_resource(show_spinner=False)
+def load_preprocessor():
+    return joblib.load(PREPROCESSOR_PATH)
 
 
 def get_tenure_cohort(tenure_months: int) -> str:
@@ -95,8 +101,6 @@ def encode_categorical_value(column_name: str, value):
 
 def prepare_customer_record(data: dict) -> pd.DataFrame:
     metadata = load_model_metadata()
-    feature_schema = metadata["feature_schema"]
-
     tenure_months = int(data["tenure_months"])
     online_security = data["online_security"]
     online_backup = data["online_backup"]
@@ -114,11 +118,12 @@ def prepare_customer_record(data: dict) -> pd.DataFrame:
         streaming_tv = "No internet service"
         streaming_movies = "No internet service"
 
-    record = {
+    raw_record = {
         "Senior Citizen": data["senior_citizen"],
         "Partner": data["partner"],
         "Dependents": data["dependents"],
         "Tenure Months": tenure_months,
+        "Multiple Lines": data["multiple_lines"],
         "Internet Service": data["internet_service"],
         "Online Security": online_security,
         "Online Backup": online_backup,
@@ -145,47 +150,28 @@ def prepare_customer_record(data: dict) -> pd.DataFrame:
             if service == "Yes"
         ),
         "Monthly_to_Tenure_Ratio": monthly_charges / (tenure_months + 1),
+        "Log_Monthly_Tenure_Ratio": math.log1p(
+            monthly_charges / (tenure_months + 1)
+        ),
     }
-
-    encoded_record = {}
-    categorical_features = {
-        "Gender",
-        "Senior Citizen",
-        "Partner",
-        "Dependents",
-        "Phone Service",
-        "Multiple Lines",
-        "Internet Service",
-        "Online Security",
-        "Online Backup",
-        "Device Protection",
-        "Tech Support",
-        "Streaming TV",
-        "Streaming Movies",
-        "Contract",
-        "Paperless Billing",
-        "Payment Method",
-        "Tenure_Cohort",
-    }
-
-    for feature in feature_schema:
-        if feature in categorical_features:
-            if feature == "Gender":
-                encoded_record[feature] = encode_categorical_value(feature, data["gender"])
-            elif feature == "Phone Service":
-                encoded_record[feature] = encode_categorical_value(feature, data["phone_service"])
-            elif feature == "Multiple Lines":
-                encoded_record[feature] = encode_categorical_value(feature, data["multiple_lines"])
-            else:
-                encoded_record[feature] = encode_categorical_value(feature, record[feature])
-            continue
-
-        if feature not in record:
-            raise KeyError(f"Feature '{feature}' was not created for model input.")
-        encoded_record[feature] = record[feature]
-
-    # Ensure we keep the exact schema and order expected by the model.
-    return pd.DataFrame([ [encoded_record[col] for col in feature_schema] ], columns=feature_schema)
+    input_schema = metadata.get("preprocessor_input_schema")
+    if input_schema is None:
+        input_schema = [
+            "Senior Citizen", "Partner", "Dependents", "Tenure Months",
+            "Multiple Lines", "Internet Service", "Online Security",
+            "Online Backup", "Device Protection", "Tech Support",
+            "Streaming TV", "Streaming Movies", "Contract",
+            "Paperless Billing", "Payment Method", "Monthly Charges",
+            "Total Charges", "Tenure_Cohort", "Total_Services",
+            "Monthly_to_Tenure_Ratio", "Log_Monthly_Tenure_Ratio",
+        ]
+    raw_df = pd.DataFrame([[raw_record[col] for col in input_schema]], columns=input_schema)
+    preprocessor = load_preprocessor()
+    transformed = preprocessor.transform(raw_df)
+    return pd.DataFrame(
+        transformed,
+        columns=preprocessor.get_feature_names_out(),
+    )
 
 
 def predict_churn(model_name: str, data: dict):
@@ -238,7 +224,11 @@ def main():
     st.title("Customer Churn Prediction")
     st.caption("Predict churn risk using the trained champion or challenger model.")
 
-    if not MODEL_DIR.is_dir() or not METADATA_PATH.is_file():
+    if (
+        not MODEL_DIR.is_dir()
+        or not METADATA_PATH.is_file()
+        or not PREPROCESSOR_PATH.is_file()
+    ):
         st.error(f"Model files are missing. {MODEL_SETUP_INSTRUCTION}")
         st.stop()
 
@@ -250,13 +240,18 @@ def main():
     st.sidebar.write(f"**Target:** {metadata['target']}")
     st.sidebar.write(f"**Features:** {len(metadata['feature_schema'])}")
 
+    try:
+        load_model(model_name)
+        load_preprocessor()
+    except Exception as exc:  # pragma: no cover - UI fallback
+        st.error(f"Model files could not be loaded: {exc}")
+        st.stop()
+
     with st.form("customer_form"):
         st.subheader("Customer profile")
         col1, col2 = st.columns(2)
 
         with col1:
-            gender = st.selectbox("Gender", ["Female", "Male"])
-            st.caption("not used by the model")
             senior_citizen = st.selectbox("Senior Citizen", ["No", "Yes"])
             partner = st.selectbox("Partner", ["No", "Yes"])
             dependents = st.selectbox("Dependents", ["No", "Yes"])
@@ -297,7 +292,6 @@ def main():
 
     if submitted:
         data = {
-            "gender": gender,
             "senior_citizen": senior_citizen,
             "partner": partner,
             "dependents": dependents,

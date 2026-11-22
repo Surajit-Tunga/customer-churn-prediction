@@ -42,7 +42,6 @@ FEATURES = [
 
 def customer(**overrides):
 	data = {
-		"gender": "Female",
 		"senior_citizen": "No",
 		"partner": "No",
 		"dependents": "No",
@@ -78,7 +77,6 @@ def app_test():
 def raw_row_to_customer(row):
 	total_charges = pd.to_numeric(pd.Series([row["Total Charges"]]), errors="coerce").fillna(0).iloc[0]
 	return {
-		"gender": row["Gender"],
 		"senior_citizen": row["Senior Citizen"],
 		"partner": row["Partner"],
 		"dependents": row["Dependents"],
@@ -140,21 +138,35 @@ def test_t04_form_loads_and_saved_models_are_estimators():
 	result = app_test()
 
 	assert not result.exception
-	assert any(widget.label == "Gender" for widget in result.selectbox)
 	for model_name in ("Champion", "Challenger"):
 		model = churn_app.load_model(model_name)
 		assert callable(model.predict_proba)
+
+
+def test_selected_model_and_preprocessor_load_before_prediction(monkeypatch):
+	loaded = []
+	monkeypatch.setattr(churn_app, "load_model", lambda name: loaded.append(("model", name)))
+	monkeypatch.setattr(churn_app, "load_preprocessor", lambda: loaded.append(("preprocessor", None)))
+
+	result = app_test()
+
+	assert not result.exception
+	assert ("model", "Champion") in loaded
+	assert ("preprocessor", None) in loaded
+	assert not any(metric.label == "Churn probability" for metric in result.metric)
 
 
 def test_t05_app_collects_or_derives_all_19_model_inputs():
 	with open(churn_app.METADATA_PATH, encoding="utf-8") as metadata_file:
 		import json
 
-		feature_schema = json.load(metadata_file)["feature_schema"]
+		metadata = json.load(metadata_file)
+		feature_schema = metadata["feature_schema"]
 	encoded = churn_app.prepare_customer_record(customer())
 
-	assert len(feature_schema) == 19
-	assert list(encoded.columns) == feature_schema == FEATURES
+	assert len(feature_schema) == 34
+	assert list(encoded.columns) == feature_schema
+	assert len(metadata["preprocessor_input_schema"]) == 21
 	assert not {"Gender", "Phone Service", "Multiple Lines"}.intersection(encoded.columns)
 
 
@@ -252,14 +264,19 @@ def test_t10_output_probability_label_model_and_warning_agree(monkeypatch, proba
 def test_t11_app_and_models_match_on_five_requested_rows():
 	raw_data = pd.read_csv(RAW_DATA_PATH)
 	selected_rows = raw_data.iloc[PARITY_ROW_POSITIONS]
-	training_features = train.prepare_training_features(selected_rows).reset_index(drop=True)
+	raw_training_features = train.prepare_training_features(selected_rows).reset_index(drop=True)
+	preprocessor = churn_app.load_preprocessor()
+	training_features = pd.DataFrame(
+		preprocessor.transform(raw_training_features),
+		columns=preprocessor.get_feature_names_out(),
+	)
 	app_features = pd.concat(
 		[churn_app.prepare_customer_record(raw_row_to_customer(row)) for _, row in selected_rows.iterrows()],
 		ignore_index=True,
 	)
 
 	np.testing.assert_allclose(training_features.to_numpy(dtype=float), app_features.to_numpy(dtype=float))
-	assert training_features.shape == (5, 19)
+	assert training_features.shape == (5, 34)
 	for model_name in ("Champion", "Challenger"):
 		model = churn_app.load_model(model_name)
 		direct_probabilities = model.predict_proba(app_features)[:, 1]
@@ -310,6 +327,7 @@ def test_d07_bounds_and_cross_field_rules_are_explicit():
 def test_d08_excluded_inputs_are_retained_but_not_in_model_schema():
 	result = app_test()
 
-	for label in ("Gender", "Phone Service", "Multiple Lines"):
+	for label in ("Phone Service", "Multiple Lines"):
 		assert any(widget.label == label for widget in result.selectbox)
-	assert sum(caption.value == "not used by the model" for caption in result.caption) == 3
+	assert not any(widget.label == "Gender" for widget in result.selectbox)
+	assert sum(caption.value == "not used by the model" for caption in result.caption) == 2

@@ -1,43 +1,43 @@
 {
     "champion": {
         "model_name": "Champion (Logistic Regression)",
-        "roc_auc": 0.8504533829342015,
-        "pr_auc": 0.6692851345571649,
-        "brier_score": 0.16233424222663698,
-        "recall_sensitivity": 0.7834224598930482,
-        "precision": 0.5167548500881834,
-        "f1_score": 0.6227417640807651,
-        "accuracy": 0.7480482611781405,
+        "roc_auc": 0.8548787103774317,
+        "pr_auc": 0.67227418121792,
+        "brier_score": 0.13252909123612505,
+        "recall_sensitivity": 0.5775401069518716,
+        "precision": 0.6728971962616822,
+        "f1_score": 0.6215827338129496,
+        "accuracy": 0.8133427963094393,
         "confusion_matrix": [
             [
-                761,
-                274
+                930,
+                105
             ],
             [
-                81,
-                293
+                158,
+                216
             ]
         ]
     },
     "challenger": {
-        "model_name": "Challenger (Gradient Boosting)",
-        "roc_auc": 0.8509946007388463,
-        "pr_auc": 0.6710785376401254,
-        "brier_score": 0.16021195276090267,
-        "recall_sensitivity": 0.8101604278074866,
-        "precision": 0.5188356164383562,
-        "f1_score": 0.6325678496868476,
-        "accuracy": 0.7501774308019872,
+        "model_name": "Challenger (XGBoost)",
+        "roc_auc": 0.8543452427084142,
+        "pr_auc": 0.6677768733254213,
+        "brier_score": 0.13399515130994347,
+        "recall_sensitivity": 0.5855614973262032,
+        "precision": 0.6460176991150443,
+        "f1_score": 0.6143057503506312,
+        "accuracy": 0.8048261178140526,
         "confusion_matrix": [
             [
-                754,
-                281
+                915,
+                120
             ],
             [
-                71,
-                303
+                155,
+                219
             ]
         ]
     },
-    "recommendation": "Challenger (Gradient Boosting)"
+    "recommendation": "Champion (Logistic Regression)"
 }

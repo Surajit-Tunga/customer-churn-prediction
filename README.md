@@ -79,7 +79,8 @@ python src/train.py
 python -m streamlit run app/app.py
 ```
 
-The app loads the saved model artifacts and feature schema from `models/`. It
+The app loads the saved model artifacts and feature schema from `models/` and
+loads the fitted 21-to-34 feature preprocessor from `data/processed/preprocessing.pkl`. It
 provides a customer input form, lets you select the Champion or Challenger
 model, computes the required engineered features, and displays the model's
 estimated churn probability and a risk category. The risk categories are
