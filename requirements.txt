@@ -1,4 +1,4 @@
-# Python 3.12 compatible runtime and test dependencies
+# Python 3.12 runtime, training, and test dependencies
 numpy>=1.26,<3
 pandas>=2.1.1
 scikit-learn==1.7.2
@@ -6,21 +6,6 @@ joblib>=1.3
 streamlit>=1.30
 xgboost==3.1.0
 pytest>=8.0
-# Core Data Processing & Mathematical Foundations 
-pandas>=2.0.0 
-numpy>=1.24.0 
-openpyxl>=3.1.0 
-
-# Machine Learning & Pipeline Building 
-scikit-learn>=1.3.0 
-joblib>=1.3.0 
-
-# Statistical Diagnostics & Analytics 
-statsmodels>=0.14.0 
-scipy>=1.10.0 
-
-# Quality Assurance & Testing Framework 
-pytest>=7.4.0 
-
-# Frontend Web Application & Deployment 
-streamlit>=1.28.0
+openpyxl>=3.1.0
+statsmodels>=0.14.0
+scipy>=1.10.0

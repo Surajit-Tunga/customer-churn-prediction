@@ -14,10 +14,10 @@ application for interactive churn-risk predictions.
 ├── data/
 │   ├── raw/                  # Original source dataset
 │   │   └── raw_telco_churn.csv
-│   └── processed/            # Cleaned and split datasets
+│   └── processed/            # Transformed splits and fitted preprocessor
 │       ├── train_telco_churn.csv
 │       ├── test_telco_churn.csv
-│       └── input_encoders.pkl
+│       └── preprocessing.pkl
 ├── docs/
 │   ├── Final_Report.md       # Project summary report
 │   ├── data_quality_report.md # Data-quality and churn analysis report
@@ -62,7 +62,7 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-On macOS or Linux:
+On macOS or Linux, activate the environment with:
 
 ```bash
 source .venv/bin/activate
@@ -70,22 +70,20 @@ source .venv/bin/activate
 
 ## Run the app
 
-From the repository root, install the dependencies and train the models before
-starting Streamlit:
-From the repository root, install the dependencies and start Streamlit:
+From the repository root, train the models, evaluate the holdout set, then
+start Streamlit:
 
-```bash
+```powershell
 python src/train.py
+python src/evaluate.py
 python -m streamlit run app/app.py
 ```
 
-The app loads the saved model artifacts and feature schema from `models/` and
-loads the fitted 21-to-34 feature preprocessor from `data/processed/preprocessing.pkl`. It
-provides a customer input form, lets you select the Champion or Challenger
-model, computes the required engineered features, and displays the model's
-estimated churn probability and a risk category. The risk categories are
-application-side bands: Low below 35%, Medium from 35% to below 60%, and High
-at 60% or above.
+The app loads the saved Champion or Challenger model from `models/` and the
+fitted 21-to-34 feature preprocessor from `data/processed/preprocessing.pkl`.
+It provides a single-customer input form and displays the estimated churn
+probability and risk category. The application-side bands are Low below 35%,
+Medium from 35% to below 60%, and High at 60% or above.
 
 The prediction is an estimate from the selected trained model, not a guarantee
 of customer behavior or a substitute for human review. The app has been
@@ -106,17 +104,9 @@ owner is responsible for maintaining the artifacts, feature schema and
 encodings, dependencies, and prediction-score meaning. Changes to that contract
 may require corresponding application updates.
 
-## Train and evaluate the model
-
-From the repository root:
-
-```bash
-python src/train.py
-python src/evaluate.py
-```
-
-The training script creates model artifacts in `models/`, and the evaluation
-script writes metrics to [docs/champion_challenger_evaluation.json](docs/champion_challenger_evaluation.json).
+The training script creates the model and preprocessing artifacts. The
+evaluation script writes holdout metrics to
+[docs/champion_challenger_evaluation.json](docs/champion_challenger_evaluation.json).
 
 ## Relevant documentation
 
