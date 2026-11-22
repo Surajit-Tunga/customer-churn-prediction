@@ -90,38 +90,4 @@ of customer behavior or a substitute for human review. The app has been
 verified locally with both model choices. It is not currently deployed, so
 there is no public application URL.
 
-### Current application status
-
-- **Available:** Single-customer interactive prediction using the saved
-  Champion or Challenger artifact.
-- **Not yet included:** Batch CSV predictions, prediction history, and
-  model-explanation features.
-- **Not yet complete for launch:** Deployment setup and hosted-environment
-  verification.
-
-The application depends on a stable model integration contract. The model
-owner is responsible for maintaining the artifacts, feature schema and
-encodings, dependencies, and prediction-score meaning. Changes to that contract
-may require corresponding application updates.
-
-The training script creates the model and preprocessing artifacts. The
-evaluation script writes holdout metrics to
-[docs/champion_challenger_evaluation.json](docs/champion_challenger_evaluation.json).
-
-## Relevant documentation
-
-- [docs/Final_Report.md](docs/Final_Report.md)
-- [docs/data_quality_report.md](docs/data_quality_report.md)
-- [docs/section_2_data_preprocessing_and_feature_engineering_report.md](docs/section_2_data_preprocessing_and_feature_engineering_report.md)
-- [data/README.md](data/README.md)
-- [tests/README.md](tests/README.md)
-
-## Data and governance
-
-- Raw dataset files are stored under [data/raw](data/raw)
-- Processed datasets and encoder artifacts are stored under [data/processed](data/processed)
-- Keep the raw data immutable and document source, licensing, and usage before
-  committing new datasets
-- Do not store sensitive or unlicensed customer data in the repository
-
 ---
