@@ -1,0 +1,158 @@
+======================================================================
+T11 PREDICTION COMPARISON
+App file tested : C:\Users\Sovan\OneDrive\Desktop\customer-churn-prediction-96ba9eb9b5ccaca9041cf60ede40971637b6f56d\app\app.py
+Test data       : test_telco_churn.csv (1409 customers), tolerance 0.01
+Target column   : Churn Value
+Model features  : 19
+======================================================================
+
+CUSTOMER 1   (row 869 of the test file)
+  Enter these values in the app:
+    Gender            : Female
+    Senior Citizen    : No
+    Partner           : No
+    Dependents        : Yes
+    Tenure Months     : 71
+    Phone Service     : No
+    Multiple Lines    : No phone service
+    Internet Service  : No
+    Online Security   : No internet service
+    Online Backup     : No internet service
+    Device Protection : No internet service
+    Tech Support      : No internet service
+    Streaming TV      : No internet service
+    Streaming Movies  : No internet service
+    Contract          : Two year
+    Paperless Billing : No
+    Payment Method    : Mailed check
+    Monthly Charges   : 24.35
+    Total Charges     : 1654.6
+  Actual Churn Value   : 0
+  Model direct     : Champion   0.3% | Challenger   0.2%
+  App code path    : Champion   0.3% | Challenger   0.2%
+  App risk label   : Champion Low risk | Challenger Low risk
+  Features equal   : PASS (app encoding vs processed row, 19 features)
+  Largest difference: 0.0000
+  RESULT           : PASS
+
+CUSTOMER 2   (row 1176 of the test file)
+  Enter these values in the app:
+    Gender            : Female
+    Senior Citizen    : No
+    Partner           : No
+    Dependents        : Yes
+    Tenure Months     : 9
+    Phone Service     : No
+    Multiple Lines    : No phone service
+    Internet Service  : No
+    Online Security   : No internet service
+    Online Backup     : No internet service
+    Device Protection : No internet service
+    Tech Support      : No internet service
+    Streaming TV      : No internet service
+    Streaming Movies  : No internet service
+    Contract          : Month-to-month
+    Paperless Billing : No
+    Payment Method    : Mailed check
+    Monthly Charges   : 20.4
+    Total Charges     : 184.1
+  Actual Churn Value   : 0
+  Model direct     : Champion  10.0% | Challenger  12.6%
+  App code path    : Champion  10.0% | Challenger  12.6%
+  App risk label   : Champion Low risk | Challenger Low risk
+  Features equal   : PASS (app encoding vs processed row, 19 features)
+  Largest difference: 0.0000
+  RESULT           : PASS
+
+CUSTOMER 3   (row 1283 of the test file)
+  Enter these values in the app:
+    Gender            : Female
+    Senior Citizen    : No
+    Partner           : No
+    Dependents        : No
+    Tenure Months     : 28
+    Phone Service     : No
+    Multiple Lines    : No phone service
+    Internet Service  : DSL
+    Online Security   : No
+    Online Backup     : No
+    Device Protection : No
+    Tech Support      : Yes
+    Streaming TV      : No
+    Streaming Movies  : No
+    Contract          : Month-to-month
+    Paperless Billing : Yes
+    Payment Method    : Credit card (automatic)
+    Monthly Charges   : 54.9
+    Total Charges     : 1505.15
+  Actual Churn Value   : 0
+  Model direct     : Champion  38.0% | Challenger  37.3%
+  App code path    : Champion  38.0% | Challenger  37.3%
+  App risk label   : Champion Medium risk | Challenger Medium risk
+  Features equal   : PASS (app encoding vs processed row, 19 features)
+  Largest difference: 0.0000
+  RESULT           : PASS
+
+CUSTOMER 4   (row 1327 of the test file)
+  Enter these values in the app:
+    Gender            : Female
+    Senior Citizen    : No
+    Partner           : No
+    Dependents        : No
+    Tenure Months     : 13
+    Phone Service     : No
+    Multiple Lines    : No phone service
+    Internet Service  : Fiber optic
+    Online Security   : Yes
+    Online Backup     : Yes
+    Device Protection : No
+    Tech Support      : No
+    Streaming TV      : Yes
+    Streaming Movies  : No
+    Contract          : Month-to-month
+    Paperless Billing : Yes
+    Payment Method    : Electronic check
+    Monthly Charges   : 96.65
+    Total Charges     : 1244.5
+  Actual Churn Value   : 1
+  Model direct     : Champion  71.0% | Challenger  80.0%
+  App code path    : Champion  71.0% | Challenger  80.0%
+  App risk label   : Champion High risk | Challenger High risk
+  Features equal   : PASS (app encoding vs processed row, 19 features)
+  Largest difference: 0.0000
+  RESULT           : PASS
+
+CUSTOMER 5   (row 1090 of the test file)
+  Enter these values in the app:
+    Gender            : Female
+    Senior Citizen    : Yes
+    Partner           : Yes
+    Dependents        : No
+    Tenure Months     : 1
+    Phone Service     : No
+    Multiple Lines    : No phone service
+    Internet Service  : Fiber optic
+    Online Security   : No
+    Online Backup     : No
+    Device Protection : No
+    Tech Support      : No
+    Streaming TV      : Yes
+    Streaming Movies  : Yes
+    Contract          : Month-to-month
+    Paperless Billing : Yes
+    Payment Method    : Electronic check
+    Monthly Charges   : 95.1
+    Total Charges     : 95.1
+  Actual Churn Value   : 1
+  Model direct     : Champion  98.3% | Challenger  96.9%
+  App code path    : Champion  98.3% | Challenger  96.9%
+  App risk label   : Champion High risk | Challenger High risk
+  Features equal   : PASS (app encoding vs processed row, 19 features)
+  Largest difference: 0.0000
+  RESULT           : PASS
+
+======================================================================
+T11 OVERALL: 5 of 5 customers PASS
+Next: use the displayed customer inputs in the Streamlit app and check that the Churn probability matches the 'Model direct' value for the selected model.
+Note: Gender, Phone Service and Multiple Lines are not used by the updated 19-feature model.
+======================================================================

@@ -1,0 +1,15 @@
+Training Dataset
+Rows: 5634
+Columns: 35
+Missing: 0
+Duplicates: 33
+Infinite: 0
+Duplicate column names: 0
+
+Testing Dataset
+Rows: 1409
+Columns: 35
+Missing: 0
+Duplicates: 1
+Infinite: 0
+Duplicate column names: 0

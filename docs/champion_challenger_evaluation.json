@@ -1,0 +1,43 @@
+{
+    "champion": {
+        "model_name": "Champion (Logistic Regression)",
+        "roc_auc": 0.8548347929422098,
+        "pr_auc": 0.6721720743194729,
+        "brier_score": 0.13254744608096916,
+        "recall_sensitivity": 0.5775401069518716,
+        "precision": 0.6708074534161491,
+        "f1_score": 0.6206896551724138,
+        "accuracy": 0.8126330731014905,
+        "confusion_matrix": [
+            [
+                929,
+                106
+            ],
+            [
+                158,
+                216
+            ]
+        ]
+    },
+    "challenger": {
+        "model_name": "Challenger (XGBoost)",
+        "roc_auc": 0.8542496577023431,
+        "pr_auc": 0.6687448691612412,
+        "brier_score": 0.13404186646252822,
+        "recall_sensitivity": 0.5828877005347594,
+        "precision": 0.6449704142011834,
+        "f1_score": 0.6123595505617978,
+        "accuracy": 0.8041163946061036,
+        "confusion_matrix": [
+            [
+                915,
+                120
+            ],
+            [
+                156,
+                218
+            ]
+        ]
+    },
+    "recommendation": "Champion (Logistic Regression)"
+}

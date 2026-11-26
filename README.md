@@ -1,41 +1,60 @@
 # Customer Churn Prediction
 
-A project scaffold for exploring customer churn data, building and evaluating
-baseline prediction models, and presenting churn risk through a Streamlit
-dashboard.
+This repository contains an IBM Telco Customer Churn analysis project covering
+preprocessing, feature engineering, model training, evaluation, and a simple
+Streamlit demonstration dashboard.
 
-> **Project status:** This repository is an early scaffold. The Streamlit page
-is a small, illustrative rule-based demo; the `src/` pipeline modules contain
-no model implementation yet, and no dataset is included. Consequently, a
-baseline model cannot currently be trained or reproduced.
-
-## Project structure
+## Repository structure
 
 ```text
 .
 ├── app/
-│   ├── app.py                 # Streamlit dashboard entry point
-│   └── components/            # Reusable dashboard components
+│   ├── app.py                 # Streamlit demo app
+│   └── components/           # Reusable UI components
 ├── data/
-│   ├── raw/                   # Original source data (not included)
-│   └── processed/             # Derived datasets
-├── docs/                      # Project documentation
-├── models/                    # Model artifacts (not included)
-├── notebooks/                 # Exploratory analysis
+│   ├── raw/                  # Original source dataset
+│   │   └── raw_telco_churn.csv
+│   └── processed/            # Cleaned and split datasets
+│       ├── train_telco_churn.csv
+│       ├── test_telco_churn.csv
+│       └── input_encoders.pkl
+├── docs/
+│   ├── Final_Report.md       # Project summary report
+│   ├── data_quality_report.md # Data-quality and churn analysis report
+│   ├── section_2_data_preprocessing_and_feature_engineering_report.md
+│   └── champion_challenger_evaluation.json
+├── models/                   # Trained model artifacts
+├── notebooks/                # Exploratory notebooks
 ├── src/
-│   ├── data_preprocessing.py  # Data validation and cleaning
-│   ├── feature_engineering.py # Feature transformations and selection
-│   ├── train.py               # Model training and baseline comparison
-│   └── evaluate.py            # Evaluation metrics and reporting
-├── tests/                     # Data and model tests
+│   ├── data_preprocessing_and_feature_engineering.ipynb
+│   ├── train.py              # Champion/challenger model training
+│   ├── evaluate.py           # Holdout evaluation metrics
+│   └── __init__.py
+├── test/
+│   ├── README.md             # Testing notes
+│   ├── test_data.py           # Data QC checks
+│   ├── test_telco_data.py     # Telco validation suite
+│   └── test_model.py          # Model-level validation checks
 ├── CONTRIBUTING.md
-└── requirements.txt           # Python app dependency
+├── LICENSE.txt
+├── README.md
+├── requirements.txt
+└── .streamlit/
 ```
 
-## Requirements and installation
+## Project overview
 
-Use Python 3 and `pip`. From the repository root, create and activate a virtual
-environment:
+The workflow is organized around the IBM Telco dataset and includes:
+
+- data validation and cleaning in the preprocessing pipeline
+- engineered churn-risk indicators and train/test split creation
+- model comparison using champion and challenger approaches
+- reproducible evaluation metrics and project reports
+- a lightweight Streamlit demo for illustrating churn risk scoring
+
+## Setup
+
+Use Python 3 and install dependencies from the project root:
 
 ```powershell
 py -m venv .venv
@@ -44,65 +63,45 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-On macOS or Linux, activate the environment with:
+On macOS or Linux:
 
 ```bash
 source .venv/bin/activate
 ```
 
-The app dependency is listed in `requirements.txt` and will be installed with
-the command above.
-
-## Run the Streamlit app
-
-From the repository root, run:
+## Run the app
 
 ```bash
 python -m streamlit run app/app.py
 ```
 
-The app accepts a few customer details and displays a rule-based demo risk
-score. This score is not a trained or validated prediction and should not be
-used to make customer decisions.
+The dashboard is a demo that uses fixed example rules and should not be treated
+as a production decision model.
 
-## Baseline model: current status and reproduction
+## Train and evaluate the model
 
-There is not yet a reproducible baseline model in this repository. The training,
-preprocessing, feature engineering, and evaluation modules are placeholders,
-and no source dataset or trained artifact is checked in. No model type,
-features, split strategy, random seed, or evaluation results have been defined,
-so there are no baseline metrics to report.
-
-Once those pieces are implemented, the intended reproduction workflow is:
-
-1. Obtain the project dataset and record its source, licence, and acquisition
-   date. Place permitted source data in `data/raw/`; do not commit sensitive or
-   unlicensed data.
-2. Record the dataset schema and target column, and implement validation and
-   preprocessing in `src/data_preprocessing.py`.
-3. Define and document the baseline features and model in `src/` and
-   `src/train.py`, including the train/test split strategy and random seed.
-4. Add all runtime and test dependencies to `requirements.txt`.
-5. Implement evaluation in `src/evaluate.py` and report the chosen metrics.
-6. Add tests and save model artifacts, if needed, under `models/`, together
-   with the training-data and feature-set details.
-
-The natural command-line entry point is expected to be `python -m src.train`
-once the training module has been implemented. At present, running it does not
-train a model or produce metrics. Update this section with the exact dataset
-preparation and training commands when the pipeline is ready.
-
-## Tests
-
-The test files are also scaffolds at present. Once test dependencies and test
-cases are implemented, run them from the repository root with:
+From the repository root:
 
 ```bash
-python -m pytest
+python src/train.py
+python src/evaluate.py
 ```
 
-## Data and privacy
+The training script creates model artifacts in `models/`, and the evaluation
+script writes metrics to [docs/champion_challenger_evaluation.json](docs/champion_challenger_evaluation.json).
 
-Keep raw source data separate from derived data. Before adding a dataset,
-document its source and licence and verify that repository storage is allowed.
-Do not commit personally identifiable or otherwise sensitive customer data.
+## Relevant documentation
+
+- [docs/Final_Report.md](docs/Final_Report.md)
+- [docs/data_quality_report.md](docs/data_quality_report.md)
+- [docs/section_2_data_preprocessing_and_feature_engineering_report.md](docs/section_2_data_preprocessing_and_feature_engineering_report.md)
+- [data/README.md](data/README.md)
+- [test/README.md](test/README.md)
+
+## Data and governance
+
+- Raw dataset files are stored under [data/raw](data/raw)
+- Processed datasets and encoder artifacts are stored under [data/processed](data/processed)
+- Keep the raw data immutable and document source, licensing, and usage before
+  committing new datasets
+- Do not store sensitive or unlicensed customer data in the repository
